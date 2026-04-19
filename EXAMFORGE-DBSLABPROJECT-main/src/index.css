@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0A0A0F;
+  --color-surface: #111118;
+  --color-card: #16161F;
+  --color-border: #1E1E2E;
+  --color-accent: #7C6AF7;
+  --color-accent-soft: #A89CF7;
+  --color-text-muted: #6B6880;
+  --color-text-sub: #9D9AB0;
+
+  --font-serif: "DM Serif Display", serif;
+  --font-sans: "DM Sans", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-[#F0EEF8] font-sans;
+  }
+}
