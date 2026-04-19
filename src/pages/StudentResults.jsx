@@ -11,12 +11,12 @@ export default function StudentResults({ token }) {
 
   return (
     <div className="fade-in" style={{ padding: "32px 36px" }}>
-      <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em", marginBottom: 20 }}>My Results</h1>
+      <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em", marginBottom: 20 }}>My Claim History</h1>
       <div className="card" style={{ overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-              {["Test", "Score", "Correct", "Wrong", "Percentage", "Rank", "Date"].map(h => (
+              {["Policy", "Approved Items", "Approved", "Rejected", "Approval %", "Rank", "Date"].map(h => (
                 <th key={h} style={{ padding: "13px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>
               ))}
             </tr>

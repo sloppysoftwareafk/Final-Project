@@ -4,7 +4,7 @@ import { auth, allowRoles } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/tests/:id/start", auth, allowRoles("Student"), async (req, res) => {
+router.post("/tests/:id/start", auth, allowRoles("Customer"), async (req, res) => {
   const { id } = req.params;
   try {
     const testQuery = await pool.query(
@@ -99,7 +99,7 @@ router.post("/tests/:id/start", auth, allowRoles("Student"), async (req, res) =>
   }
 });
 
-router.get("/tests/:id/questions", auth, allowRoles("Student"), async (req, res) => {
+router.get("/tests/:id/questions", auth, allowRoles("Customer"), async (req, res) => {
   const { id } = req.params;
   try {
     const activeAttempt = await pool.query(
@@ -136,7 +136,7 @@ router.get("/tests/:id/questions", auth, allowRoles("Student"), async (req, res)
   }
 });
 
-router.post("/tests/:id/submit", auth, allowRoles("Student"), async (req, res) => {
+router.post("/tests/:id/submit", auth, allowRoles("Customer"), async (req, res) => {
   const { id } = req.params;
   const { attemptId, answers = [], timeSpentSeconds = 0 } = req.body;
   if (!attemptId || !Array.isArray(answers)) {

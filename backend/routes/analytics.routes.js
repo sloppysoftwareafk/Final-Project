@@ -18,7 +18,7 @@ router.get("/analytics/summary", auth, async (req, res) => {
     );
 
     let activeTests = 0;
-    if (req.user.role === "Student") {
+    if (req.user.role === "Customer") {
       const activeTestsQuery = await pool.query(
         `SELECT COUNT(*)::INT AS active_tests
          FROM tests t
@@ -44,7 +44,7 @@ router.get("/analytics/summary", auth, async (req, res) => {
     const studentsQuery = await pool.query(
       `SELECT COUNT(*)::INT AS students_enrolled
        FROM users
-       WHERE role = 'Student'`
+       WHERE role = 'Customer'`
     );
 
     return res.json({
@@ -60,13 +60,13 @@ router.get("/analytics/summary", auth, async (req, res) => {
   }
 });
 
-router.get("/analytics/overview", auth, allowRoles("Instructor"), async (_req, res) => {
+router.get("/analytics/overview", auth, allowRoles("Admin"), async (_req, res) => {
   try {
     const summaryQuery = await pool.query(
       `SELECT
         (SELECT COUNT(*) FROM questions) AS total_questions,
         (SELECT COUNT(*) FROM tests WHERE status IN ('Live','Scheduled')) AS active_tests,
-        (SELECT COUNT(*) FROM users WHERE role = 'Student') AS students_enrolled,
+        (SELECT COUNT(*) FROM users WHERE role = 'Customer') AS students_enrolled,
         (SELECT COALESCE(ROUND(AVG(percentage),2), 0) FROM results) AS avg_score`
     );
 
@@ -74,11 +74,11 @@ router.get("/analytics/overview", auth, allowRoles("Instructor"), async (_req, r
       `WITH topics AS (
         SELECT topic
         FROM (VALUES
-          ('Data Structures'),
-          ('Algorithms'),
-          ('Databases'),
-          ('Networking'),
-          ('OS')
+          ('Life Insurance'),
+          ('Health Insurance'),
+          ('Vehicle Insurance'),
+          ('Home Insurance'),
+          ('Travel Insurance')
         ) AS fixed_topics(topic)
       )
       SELECT
