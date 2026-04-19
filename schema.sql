@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(120) NOT NULL,
   email VARCHAR(190) UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role VARCHAR(20) NOT NULL CHECK (role IN ('Student', 'Contributor', 'Instructor')),
+  role VARCHAR(20) NOT NULL CHECK (role IN ('Customer', 'Agent', 'Admin')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -176,20 +176,20 @@ GROUP BY r.user_id, u.full_name;
 
 INSERT INTO users (full_name, email, password_hash, role)
 VALUES
-  ('Instructor Admin', 'instructor@test.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Instructor'),
-  ('TA Contributor', 'contributor@test.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Contributor'),
-  ('Student User', 'student@test.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Student'),
-  ('Student Two', 'student2@test.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Student')
+  ('Admin User', 'admin@insureflow.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Admin'),
+  ('Field Agent', 'agent@insureflow.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Agent'),
+  ('Customer One', 'customer@insureflow.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Customer'),
+  ('Customer Two', 'customer2@insureflow.com', '$2b$10$kGGO9s3xHEN5pFqxfwsp.u0mwzManskSI1jwoQgz3mGZ8DWwRZB3y', 'Customer')
 ON CONFLICT (email) DO NOTHING;
 
 WITH q AS (
   INSERT INTO questions (created_by, approved_by, topic, difficulty, question_text, status)
   VALUES
-    ((SELECT id FROM users WHERE email = 'instructor@test.com'), (SELECT id FROM users WHERE email = 'instructor@test.com'), 'Data Structures', 'Medium', 'Which data structure uses LIFO order?', 'Approved'),
-    ((SELECT id FROM users WHERE email = 'instructor@test.com'), (SELECT id FROM users WHERE email = 'instructor@test.com'), 'Algorithms', 'Hard', 'What is the average complexity of QuickSort?', 'Approved'),
-    ((SELECT id FROM users WHERE email = 'contributor@test.com'), NULL, 'Databases', 'Easy', 'Which SQL clause filters grouped rows?', 'Pending'),
-    ((SELECT id FROM users WHERE email = 'instructor@test.com'), (SELECT id FROM users WHERE email = 'instructor@test.com'), 'Networking', 'Easy', 'HTTP stands for?', 'Approved'),
-    ((SELECT id FROM users WHERE email = 'instructor@test.com'), (SELECT id FROM users WHERE email = 'instructor@test.com'), 'OS', 'Hard', 'Which algorithm can cause starvation?', 'Approved')
+    ((SELECT id FROM users WHERE email = 'admin@insureflow.com'), (SELECT id FROM users WHERE email = 'admin@insureflow.com'), 'Life Insurance', 'Medium', 'Which policy plan covers accidental hospitalization?', 'Approved'),
+    ((SELECT id FROM users WHERE email = 'admin@insureflow.com'), (SELECT id FROM users WHERE email = 'admin@insureflow.com'), 'Health Insurance', 'Hard', 'Which health plan includes cashless network hospitals?', 'Approved'),
+    ((SELECT id FROM users WHERE email = 'agent@insureflow.com'), NULL, 'Vehicle Insurance', 'Easy', 'Which vehicle plan includes zero-depreciation add-on?', 'Pending'),
+    ((SELECT id FROM users WHERE email = 'admin@insureflow.com'), (SELECT id FROM users WHERE email = 'admin@insureflow.com'), 'Home Insurance', 'Easy', 'Which home plan protects against fire damage?', 'Approved'),
+    ((SELECT id FROM users WHERE email = 'admin@insureflow.com'), (SELECT id FROM users WHERE email = 'admin@insureflow.com'), 'Travel Insurance', 'Hard', 'Which travel plan provides overseas emergency assistance?', 'Approved')
   RETURNING id, question_text
 )
 INSERT INTO options (question_id, option_text, is_correct)
@@ -198,51 +198,51 @@ FROM q
 JOIN LATERAL (
   SELECT * FROM (
     VALUES
-      ('Which data structure uses LIFO order?', 'Queue', FALSE),
-      ('Which data structure uses LIFO order?', 'Stack', TRUE),
-      ('Which data structure uses LIFO order?', 'Array', FALSE),
-      ('Which data structure uses LIFO order?', 'Linked List', FALSE),
-      ('What is the average complexity of QuickSort?', 'O(n²)', FALSE),
-      ('What is the average complexity of QuickSort?', 'O(n log n)', TRUE),
-      ('What is the average complexity of QuickSort?', 'O(n)', FALSE),
-      ('What is the average complexity of QuickSort?', 'O(log n)', FALSE),
-      ('Which SQL clause filters grouped rows?', 'WHERE', FALSE),
-      ('Which SQL clause filters grouped rows?', 'ORDER BY', FALSE),
-      ('Which SQL clause filters grouped rows?', 'HAVING', TRUE),
-      ('Which SQL clause filters grouped rows?', 'GROUP BY', FALSE),
-      ('HTTP stands for?', 'HyperText Transfer Protocol', TRUE),
-      ('HTTP stands for?', 'High Transfer Text Protocol', FALSE),
-      ('HTTP stands for?', 'Hyper Terminal Transfer Protocol', FALSE),
-      ('HTTP stands for?', 'HyperText Transmission Protocol', FALSE),
-      ('Which algorithm can cause starvation?', 'Round Robin', FALSE),
-      ('Which algorithm can cause starvation?', 'FCFS', FALSE),
-      ('Which algorithm can cause starvation?', 'Priority Scheduling', TRUE),
-      ('Which algorithm can cause starvation?', 'SJF', FALSE)
+      ('Which policy plan covers accidental hospitalization?', 'Basic OPD only', FALSE),
+      ('Which policy plan covers accidental hospitalization?', 'Comprehensive hospitalization cover', TRUE),
+      ('Which policy plan covers accidental hospitalization?', 'No emergency cover', FALSE),
+      ('Which policy plan covers accidental hospitalization?', 'Dental-only plan', FALSE),
+      ('Which health plan includes cashless network hospitals?', 'No network hospitals', FALSE),
+      ('Which health plan includes cashless network hospitals?', 'Includes cashless hospital network', TRUE),
+      ('Which health plan includes cashless network hospitals?', 'Only pharmacy discounts', FALSE),
+      ('Which health plan includes cashless network hospitals?', 'Dental only coverage', FALSE),
+      ('Which vehicle plan includes zero-depreciation add-on?', 'Third-party only', FALSE),
+      ('Which vehicle plan includes zero-depreciation add-on?', 'Theft exclusion only', FALSE),
+      ('Which vehicle plan includes zero-depreciation add-on?', 'Includes zero-depreciation', TRUE),
+      ('Which vehicle plan includes zero-depreciation add-on?', 'No own-damage cover', FALSE),
+      ('Which home plan protects against fire damage?', 'Fire and smoke damage cover', TRUE),
+      ('Which home plan protects against fire damage?', 'Electrical damage only', FALSE),
+      ('Which home plan protects against fire damage?', 'No structural damage cover', FALSE),
+      ('Which home plan protects against fire damage?', 'Furniture polishing cover', FALSE),
+      ('Which travel plan provides overseas emergency assistance?', 'Visa processing only', FALSE),
+      ('Which travel plan provides overseas emergency assistance?', 'No medical support abroad', FALSE),
+      ('Which travel plan provides overseas emergency assistance?', 'Emergency medical + trip interruption cover', TRUE),
+      ('Which travel plan provides overseas emergency assistance?', 'Luggage only cover', FALSE)
   ) AS t(question_text, option_text, is_correct)
 ) AS x ON x.question_text = q.question_text;
 
 INSERT INTO tests (title, topic, total_questions, duration_minutes, status, scheduled_at, created_by)
 VALUES
-  ('Data Structures Midterm', 'Data Structures', 5, 45, 'Scheduled', NOW() + INTERVAL '2 day', (SELECT id FROM users WHERE email = 'instructor@test.com')),
-  ('Algorithms Final', 'Algorithms', 5, 60, 'Live', NOW(), (SELECT id FROM users WHERE email = 'instructor@test.com')),
-  ('Database Management Quiz', 'Databases', 5, 30, 'Completed', NOW() - INTERVAL '5 day', (SELECT id FROM users WHERE email = 'instructor@test.com'))
+  ('Life Shield Gold Policy', 'Life Insurance', 5, 45, 'Scheduled', NOW() + INTERVAL '2 day', (SELECT id FROM users WHERE email = 'admin@insureflow.com')),
+  ('Health Secure Plus Policy', 'Health Insurance', 5, 60, 'Live', NOW(), (SELECT id FROM users WHERE email = 'admin@insureflow.com')),
+  ('Auto Protect Premium Policy', 'Vehicle Insurance', 5, 30, 'Completed', NOW() - INTERVAL '5 day', (SELECT id FROM users WHERE email = 'admin@insureflow.com'))
 ON CONFLICT DO NOTHING;
 
 INSERT INTO test_questions (test_id, question_id, question_order)
 VALUES
   (
-    (SELECT id FROM tests WHERE title = 'Data Structures Midterm' LIMIT 1),
-    (SELECT id FROM questions WHERE question_text = 'Which data structure uses LIFO order?' LIMIT 1),
+    (SELECT id FROM tests WHERE title = 'Life Shield Gold Policy' LIMIT 1),
+    (SELECT id FROM questions WHERE question_text = 'Which policy plan covers accidental hospitalization?' LIMIT 1),
     1
   ),
   (
-    (SELECT id FROM tests WHERE title = 'Algorithms Final' LIMIT 1),
-    (SELECT id FROM questions WHERE question_text = 'What is the average complexity of QuickSort?' LIMIT 1),
+    (SELECT id FROM tests WHERE title = 'Health Secure Plus Policy' LIMIT 1),
+    (SELECT id FROM questions WHERE question_text = 'Which health plan includes cashless network hospitals?' LIMIT 1),
     1
   ),
   (
-    (SELECT id FROM tests WHERE title = 'Database Management Quiz' LIMIT 1),
-    (SELECT id FROM questions WHERE question_text = 'Which SQL clause filters grouped rows?' LIMIT 1),
+    (SELECT id FROM tests WHERE title = 'Auto Protect Premium Policy' LIMIT 1),
+    (SELECT id FROM questions WHERE question_text = 'Which vehicle plan includes zero-depreciation add-on?' LIMIT 1),
     1
   )
 ON CONFLICT DO NOTHING;

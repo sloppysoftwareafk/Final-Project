@@ -11,22 +11,22 @@ import Analytics from "./pages/Analytics";
 import StudentResults from "./pages/StudentResults";
 
 const NAV_BY_ROLE = {
-  Instructor: [
+  Admin: [
     { id: "dashboard", label: "Dashboard", icon: "home" },
-    { id: "questions", label: "Question Bank", icon: "book" },
-    { id: "tests", label: "Tests", icon: "test" },
-    { id: "analytics", label: "Analytics", icon: "chart" },
+    { id: "questions", label: "Policy Plans", icon: "book" },
+    { id: "tests", label: "Policies", icon: "test" },
+    { id: "analytics", label: "Operations Analytics", icon: "chart" },
   ],
-  Contributor: [
+  Agent: [
     { id: "dashboard", label: "Dashboard", icon: "home" },
-    { id: "questions", label: "Question Bank", icon: "book" },
-    { id: "tests", label: "Tests", icon: "test" },
+    { id: "questions", label: "Policy Plans", icon: "book" },
+    { id: "tests", label: "Policies", icon: "test" },
   ],
-  Student: [
+  Customer: [
     { id: "dashboard", label: "Dashboard", icon: "home" },
-    { id: "tests", label: "Available Tests", icon: "test" },
-    { id: "take-test", label: "Take Test", icon: "clock" },
-    { id: "results", label: "Results", icon: "chart" },
+    { id: "tests", label: "Available Policies", icon: "test" },
+    { id: "take-test", label: "File Claim", icon: "clock" },
+    { id: "results", label: "Claim History", icon: "chart" },
   ],
 };
 
@@ -86,7 +86,7 @@ export default function App() {
     setSelectedTestId(null);
   };
 
-  const nav = useMemo(() => NAV_BY_ROLE[user?.role || "Student"], [user?.role]);
+  const nav = useMemo(() => NAV_BY_ROLE[user?.role || "Customer"], [user?.role]);
 
   if (!token || !user) {
     return (
@@ -102,8 +102,8 @@ export default function App() {
     if (page === "questions") return <QuestionBank token={token} role={user.role} />;
     if (page === "tests") return <Tests token={token} role={user.role} setPage={setPage} setSelectedTestId={setSelectedTestId} />;
     if (page === "take-test") return <TakeTest token={token} selectedTestId={selectedTestId} />;
-    if (page === "analytics" && user.role === "Instructor") return <Analytics token={token} />;
-    if (page === "results" && user.role === "Student") return <StudentResults token={token} />;
+    if (page === "analytics" && user.role === "Admin") return <Analytics token={token} />;
+    if (page === "results" && user.role === "Customer") return <StudentResults token={token} />;
     return null;
   };
 
@@ -114,9 +114,9 @@ export default function App() {
         <div style={{ width: 220, flexShrink: 0, background: COLORS.surface, borderRight: `1px solid ${COLORS.border}`, display: "flex", flexDirection: "column", padding: "20px 14px" }}>
           <div style={{ padding: "10px 10px 28px" }}>
             <div className="serif" style={{ fontSize: 19, letterSpacing: "-0.02em", color: COLORS.text }}>
-              <span style={{ color: COLORS.accentSoft }}>exam</span>forge
+              <span style={{ color: COLORS.accentSoft }}>insure</span>forge
             </div>
-            <div style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }}>MCQ Management System</div>
+            <div style={{ fontSize: 11, color: COLORS.textMuted, marginTop: 2 }}>Insurance Policy Management System</div>
           </div>
 
           <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>

@@ -2,22 +2,22 @@ import { COLORS } from "../lib/theme";
 import Icon from "../components/Icon";
 
 export default function Dashboard({ setPage, setSelectedTestId, summary, leaderboard, tests = [], role, user }) {
-  const myLeaderboardEntry = role === "Student"
+  const myLeaderboardEntry = role === "Customer"
     ? leaderboard.find((entry) => Number(entry.userId) === Number(user?.id))
     : null;
 
-  const stats = role === "Student"
+  const stats = role === "Customer"
     ? [
-        { label: "Available Tests", value: String(tests.length || summary.active_tests || 0), icon: "test", delta: "Take a test now" },
-        { label: "My Attempts", value: String(myLeaderboardEntry?.tests || 0), icon: "book", delta: "Tests you have taken" },
+        { label: "Available Policies", value: String(tests.length || summary.active_tests || 0), icon: "test", delta: "Take a test now" },
+        { label: "My Claims", value: String(myLeaderboardEntry?.tests || 0), icon: "book", delta: "Tests you have taken" },
         { label: "Class Avg.", value: `${summary.avg_score || 0}%`, icon: "chart", delta: "Across all submissions" },
         { label: "Ranking", value: myLeaderboardEntry?.rank ? `#${myLeaderboardEntry.rank}` : "-", icon: "trophy", delta: "Keep improving" },
       ]
     : [
-        { label: "Total Questions", value: String(summary.total_questions || 0), icon: "book", delta: "Question bank" },
-        { label: "Active Tests", value: String(summary.active_tests || 0), icon: "test", delta: "Live + scheduled" },
-        { label: "Students Enrolled", value: String(summary.students_enrolled || 0), icon: "user", delta: "Registered students" },
-        { label: "Avg. Score", value: `${summary.avg_score || 0}%`, icon: "chart", delta: "Overall average" },
+        { label: "Total Policy Plans", value: String(summary.total_questions || 0), icon: "book", delta: "Question bank" },
+        { label: "Active Policies", value: String(summary.active_tests || 0), icon: "test", delta: "Live + scheduled" },
+        { label: "Customers Enrolled", value: String(summary.students_enrolled || 0), icon: "user", delta: "Registered students" },
+        { label: "Avg. Claim Approval", value: `${summary.avg_score || 0}%`, icon: "chart", delta: "Overall average" },
       ];
 
   return (
@@ -43,10 +43,10 @@ export default function Dashboard({ setPage, setSelectedTestId, summary, leaderb
       <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
         <div className="card" style={{ padding: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 600 }}>{role === "Student" ? "Available Tests" : "Recent Tests"}</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 600 }}>{role === "Customer" ? "Available Policies" : "Recent Policies"}</h2>
             <button className="btn-ghost" onClick={() => setPage("tests")} style={{ fontSize: 12, padding: "6px 14px" }}>View all</button>
           </div>
-          {role === "Student" ? (
+          {role === "Customer" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {tests.slice(0, 3).map((test) => (
                 <div key={test.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: "10px 12px", background: COLORS.surface }}>
@@ -57,17 +57,17 @@ export default function Dashboard({ setPage, setSelectedTestId, summary, leaderb
                   <button className="btn-primary" style={{ fontSize: 12, padding: "6px 12px" }} onClick={() => { setSelectedTestId(test.id); setPage("take-test"); }}>Start</button>
                 </div>
               ))}
-              {tests.length === 0 && <p style={{ color: COLORS.textMuted, fontSize: 13 }}>No available tests right now.</p>}
+              {tests.length === 0 && <p style={{ color: COLORS.textMuted, fontSize: 13 }}>No available policies right now.</p>}
             </div>
           ) : (
-            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>Navigate to Tests for full actions and attempts.</p>
+            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>Navigate to Policies for full policy and claim actions.</p>
           )}
         </div>
 
         <div className="card" style={{ padding: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
             <Icon name="trophy" size={15} color={COLORS.amber} />
-            <h2 style={{ fontSize: 16, fontWeight: 600 }}>Leaderboard</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 600 }}>Customer Leaderboard</h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {leaderboard.map((s) => (

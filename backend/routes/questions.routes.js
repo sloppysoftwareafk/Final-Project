@@ -24,7 +24,7 @@ router.get("/questions", auth, async (req, res) => {
   if (status && status !== "All") {
     values.push(status);
     where.push(`q.status = $${values.length}`);
-  } else if (req.user.role === "Student") {
+  } else if (req.user.role === "Customer") {
     where.push(`q.status = 'Approved'`);
   }
 
@@ -53,7 +53,7 @@ router.get("/questions", auth, async (req, res) => {
   }
 });
 
-router.post("/questions", auth, allowRoles("Contributor", "Instructor"), async (req, res) => {
+router.post("/questions", auth, allowRoles("Agent", "Admin"), async (req, res) => {
   const { topic, difficulty, text, options, correctIndex } = req.body;
   if (!topic || !difficulty || !text || !Array.isArray(options) || options.length < 2) {
     return res.status(400).json({ message: "Invalid payload" });
@@ -65,8 +65,8 @@ router.post("/questions", auth, allowRoles("Contributor", "Instructor"), async (
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const status = req.user.role === "Instructor" ? "Approved" : "Pending";
-    const approvedBy = req.user.role === "Instructor" ? req.user.id : null;
+    const status = req.user.role === "Admin" ? "Approved" : "Pending";
+    const approvedBy = req.user.role === "Admin" ? req.user.id : null;
 
     const questionInsert = await client.query(
       `INSERT INTO questions (created_by, approved_by, topic, difficulty, question_text, status)
@@ -93,7 +93,7 @@ router.post("/questions", auth, allowRoles("Contributor", "Instructor"), async (
   }
 });
 
-router.patch("/questions/:id/status", auth, allowRoles("Instructor"), async (req, res) => {
+router.patch("/questions/:id/status", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   if (!["Approved", "Rejected", "Pending"].includes(status)) {
