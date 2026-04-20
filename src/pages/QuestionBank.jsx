@@ -4,54 +4,54 @@ import { COLORS } from "../lib/theme";
 import Icon from "../components/Icon";
 import { DifficultyPill, Pill } from "../components/Pills";
 
-export default function QuestionBank({ token, role }) {
+export default function PlanBank({ token, role }) {
   const [search, setSearch] = useState("");
   const [topic, setTopic] = useState("All");
   const [diff, setDiff] = useState("All");
   const [status, setStatus] = useState(role === "Student" ? "Approved" : "All");
-  const [questions, setQuestions] = useState([]);
+  const [questions, setPlans] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ topic: "Data Structures", difficulty: "Easy", text: "", options: ["", "", "", ""], correctIndex: 0 });
 
   const topics = ["All", "Data Structures", "Algorithms", "Databases", "Networking", "OS"];
   const diffs = ["All", "Easy", "Medium", "Hard"];
 
-  const loadQuestions = async () => {
+  const loadPlans = async () => {
     const params = new URLSearchParams({ search, topic, difficulty: diff, status });
     const data = await api(`/questions?${params.toString()}`, { token });
-    setQuestions(data);
+    setPlans(data);
   };
 
-  useEffect(() => { loadQuestions(); }, [search, topic, diff, status]);
+  useEffect(() => { loadPlans(); }, [search, topic, diff, status]);
 
-  const addQuestion = async () => {
+  const addPlan = async () => {
     await api("/questions", { method: "POST", token, body: form });
     setShowModal(false);
     setForm({ topic: "Data Structures", difficulty: "Easy", text: "", options: ["", "", "", ""], correctIndex: 0 });
-    await loadQuestions();
+    await loadPlans();
   };
 
   const updateStatus = async (id, nextStatus) => {
     await api(`/questions/${id}/status`, { method: "PATCH", token, body: { status: nextStatus } });
-    await loadQuestions();
+    await loadPlans();
   };
 
   return (
     <div className="fade-in" style={{ padding: "32px 36px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>Question Bank</h1>
-          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>{questions.length} loaded questions</p>
+          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>Policy Plan Library</h1>
+          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>{questions.length} loaded plans</p>
         </div>
         {(role === "Contributor" || role === "Instructor") && (
           <button className="btn-primary" style={{ display: "flex", alignItems: "center", gap: 7 }} onClick={() => setShowModal(true)}>
-            <Icon name="plus" size={14} color="#fff" /> Add Question
+            <Icon name="plus" size={14} color="#fff" /> Add Plan
           </button>
         )}
       </div>
 
       <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
-        <input className="input-field" style={{ width: 240 }} placeholder="Search questions..." value={search} onChange={e => setSearch(e.target.value)} />
+        <input className="input-field" style={{ width: 240 }} placeholder="Search policy plans..." value={search} onChange={e => setSearch(e.target.value)} />
         <select className="input-field" style={{ width: 160 }} value={topic} onChange={e => setTopic(e.target.value)}>{topics.map(t => <option key={t}>{t}</option>)}</select>
         <select className="input-field" style={{ width: 130 }} value={diff} onChange={e => setDiff(e.target.value)}>{diffs.map(d => <option key={d}>{d}</option>)}</select>
         {role !== "Student" && <select className="input-field" style={{ width: 140 }} value={status} onChange={e => setStatus(e.target.value)}>{["All", "Pending", "Approved", "Rejected"].map(s => <option key={s}>{s}</option>)}</select>}
@@ -61,7 +61,7 @@ export default function QuestionBank({ token, role }) {
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-              {["#", "Question", "Topic", "Difficulty", "Status", "Options", ""].map(h => <th key={h} style={{ padding: "13px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>)}
+              {["#", "Plan", "Topic", "Difficulty", "Status", "Coverages", ""].map(h => <th key={h} style={{ padding: "13px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: COLORS.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -85,18 +85,18 @@ export default function QuestionBank({ token, role }) {
             ))}
           </tbody>
         </table>
-        {questions.length === 0 && <div style={{ padding: 40, textAlign: "center", color: COLORS.textMuted, fontSize: 14 }}>No questions found</div>}
+        {questions.length === 0 && <div style={{ padding: 40, textAlign: "center", color: COLORS.textMuted, fontSize: 14 }}>No policy plans found</div>}
       </div>
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "grid", placeItems: "center", zIndex: 50 }}>
           <div className="card" style={{ width: 640, padding: 24 }}>
-            <h3 className="serif" style={{ fontSize: 24, marginBottom: 14 }}>Add Question</h3>
+            <h3 className="serif" style={{ fontSize: 24, marginBottom: 14 }}>Add Plan</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
               <select className="input-field" value={form.topic} onChange={(e) => setForm((p) => ({ ...p, topic: e.target.value }))}>{topics.slice(1).map(t => <option key={t}>{t}</option>)}</select>
               <select className="input-field" value={form.difficulty} onChange={(e) => setForm((p) => ({ ...p, difficulty: e.target.value }))}>{diffs.slice(1).map(d => <option key={d}>{d}</option>)}</select>
             </div>
-            <textarea className="input-field" rows={3} placeholder="Question text" value={form.text} onChange={(e) => setForm((p) => ({ ...p, text: e.target.value }))} />
+            <textarea className="input-field" rows={3} placeholder="Plan text" value={form.text} onChange={(e) => setForm((p) => ({ ...p, text: e.target.value }))} />
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 12 }}>
               {form.options.map((opt, idx) => (
                 <input key={idx} className="input-field" placeholder={`Option ${idx + 1}`} value={opt} onChange={(e) => { const next = [...form.options]; next[idx] = e.target.value; setForm((p) => ({ ...p, options: next })); }} />
@@ -107,7 +107,7 @@ export default function QuestionBank({ token, role }) {
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 18 }}>
               <button className="btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn-primary" onClick={addQuestion}>Submit</button>
+              <button className="btn-primary" onClick={addPlan}>Submit</button>
             </div>
           </div>
         </div>

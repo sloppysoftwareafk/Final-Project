@@ -4,7 +4,7 @@ import { auth, allowRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/results/me", auth, allowRoles("Student"), async (req, res) => {
+router.get("/results/me", auth, allowRoles("Customer"), async (req, res) => {
   try {
     const { rows } = await pool.query(
       `SELECT

@@ -24,7 +24,7 @@ router.get("/tests", auth, async (req, res) => {
       ORDER BY t.created_at DESC`;
     let params = [];
 
-    if (req.user.role === "Student") {
+    if (req.user.role === "Customer") {
       query = `${baseSelect}
         LEFT JOIN attempts my_done ON my_done.test_id = t.id AND my_done.user_id = $1 AND my_done.status IN ('Submitted', 'AutoSubmitted')
         WHERE my_done.id IS NULL
@@ -42,7 +42,7 @@ router.get("/tests", auth, async (req, res) => {
   }
 });
 
-router.post("/tests", auth, allowRoles("Instructor"), async (req, res) => {
+router.post("/tests", auth, allowRoles("Admin"), async (req, res) => {
   const { title, topic, durationMinutes, status = "Scheduled", scheduledAt } = req.body;
   if (!title || !topic || !durationMinutes) {
     return res.status(400).json({ message: "title, topic, durationMinutes are required" });
@@ -65,7 +65,7 @@ router.post("/tests", auth, allowRoles("Instructor"), async (req, res) => {
   }
 });
 
-router.patch("/tests/:id", auth, allowRoles("Instructor"), async (req, res) => {
+router.patch("/tests/:id", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   const { title, topic, durationMinutes, status, scheduledAt } = req.body;
   if (!title || !topic || !durationMinutes || !status) {
@@ -107,7 +107,7 @@ router.patch("/tests/:id", auth, allowRoles("Instructor"), async (req, res) => {
   }
 });
 
-router.post("/tests/:id/close", auth, allowRoles("Instructor"), async (req, res) => {
+router.post("/tests/:id/close", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   try {
     const existing = await pool.query("SELECT id FROM tests WHERE id = $1", [id]);
@@ -130,7 +130,7 @@ router.post("/tests/:id/close", auth, allowRoles("Instructor"), async (req, res)
   }
 });
 
-router.delete("/tests/:id", auth, allowRoles("Instructor"), async (req, res) => {
+router.delete("/tests/:id", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   try {
     const { rowCount } = await pool.query("DELETE FROM tests WHERE id = $1", [id]);
@@ -143,7 +143,7 @@ router.delete("/tests/:id", auth, allowRoles("Instructor"), async (req, res) => 
   }
 });
 
-router.get("/tests/:id/analytics", auth, allowRoles("Instructor"), async (req, res) => {
+router.get("/tests/:id/analytics", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   try {
     const summaryQuery = await pool.query(

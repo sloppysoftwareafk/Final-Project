@@ -36,11 +36,11 @@ router.post("/auth/login", async (req, res) => {
 });
 
 router.post("/auth/register", async (req, res) => {
-  const { fullName, email, password, role = "Student" } = req.body;
+  const { fullName, email, password, role = "Customer" } = req.body;
   if (!fullName || !email || !password) {
     return res.status(400).json({ message: "fullName, email, password are required" });
   }
-  if (!["Student", "Contributor", "Instructor"].includes(role)) {
+  if (!["Customer", "Agent", "Admin"].includes(role)) {
     return res.status(400).json({ message: "Invalid role" });
   }
 

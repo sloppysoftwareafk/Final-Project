@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 router.get("/health", async (_req, res) => {
   try {
     await pool.query("SELECT 1");
-    res.json({ ok: true, service: "test-mgmt-api" });
+    res.json({ ok: true, service: "insurance-policy-api" });
   } catch (error) {
     res.status(500).json({ ok: false, message: error.message });
   }

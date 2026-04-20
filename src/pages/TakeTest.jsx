@@ -4,9 +4,11 @@ import { COLORS } from "../lib/theme";
 import Icon from "../components/Icon";
 import { DifficultyPill, Pill } from "../components/Pills";
 
-export default function TakeTest({ token, selectedTestId }) {
+export default function TakeTest({ token, selectedTestId, onSelectTest }) {
   const [attemptMeta, setAttemptMeta] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [availablePolicies, setAvailablePolicies] = useState([]);
+  const [loadingPolicies, setLoadingPolicies] = useState(false);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -15,6 +17,22 @@ export default function TakeTest({ token, selectedTestId }) {
   const [error, setError] = useState("");
 
   const storageKey = selectedTestId ? `take-test:${selectedTestId}` : null;
+
+  useEffect(() => {
+    if (selectedTestId) return;
+    (async () => {
+      try {
+        setLoadingPolicies(true);
+        setError("");
+        const list = await api("/tests", { token });
+        setAvailablePolicies(Array.isArray(list) ? list : []);
+      } catch (err) {
+        setError(err.message || "Unable to load policies");
+      } finally {
+        setLoadingPolicies(false);
+      }
+    })();
+  }, [selectedTestId, token]);
 
   useEffect(() => {
     if (!selectedTestId) return;
@@ -109,9 +127,43 @@ export default function TakeTest({ token, selectedTestId }) {
     autoSubmit();
   }, [timeLeft, attemptMeta, submitted, questions.length, answers, selectedTestId, token, storageKey]);
 
-  if (!selectedTestId) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24 }}>Select a test from Tests page.</div></div>;
+  if (!selectedTestId) {
+    return (
+      <div className="fade-in" style={{ padding: "32px 36px" }}>
+        <div style={{ marginBottom: 18 }}>
+          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>File Claim</h1>
+          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>Choose a policy to start your claim flow.</p>
+        </div>
+        <div className="card" style={{ padding: 20 }}>
+          {loadingPolicies ? (
+            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>Loading available policies...</p>
+          ) : availablePolicies.length === 0 ? (
+            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>No active policies are available right now.</p>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 12 }}>
+              {availablePolicies.map((policy) => (
+                <div key={policy.id} style={{ border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: 14, background: COLORS.surface }}>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{policy.title}</div>
+                  <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 4 }}>
+                    {policy.topic} · {policy.questions} plans · {policy.duration}m
+                  </div>
+                  <button
+                    className="btn-primary"
+                    style={{ marginTop: 10, width: "100%", fontSize: 12, padding: "7px 0" }}
+                    onClick={() => onSelectTest?.(policy.id)}
+                  >
+                    Start Claim
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
   if (error) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24, color: COLORS.red }}>{error}</div></div>;
-  if (!attemptMeta || questions.length === 0) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24 }}>Loading test...</div></div>;
+  if (!attemptMeta || questions.length === 0) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24 }}>Loading policy details...</div></div>;
 
   const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
   const safeCurrent = Math.max(0, Math.min(current, questions.length - 1));
@@ -137,8 +189,8 @@ export default function TakeTest({ token, selectedTestId }) {
     return (
       <div className="fade-in" style={{ padding: "48px 36px", maxWidth: 560, margin: "0 auto", textAlign: "center" }}>
         <div style={{ fontSize: 56, marginBottom: 16 }}>{pct >= 70 ? "🎉" : pct >= 40 ? "👍" : "📚"}</div>
-        <h1 className="serif" style={{ fontSize: 32, marginBottom: 8 }}>Test Complete</h1>
-        <p style={{ color: COLORS.textMuted, marginBottom: 32 }}>Here's how you did</p>
+        <h1 className="serif" style={{ fontSize: 32, marginBottom: 8 }}>Claim Submitted</h1>
+        <p style={{ color: COLORS.textMuted, marginBottom: 32 }}>Claim review summary</p>
         <div style={{ background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 16, padding: 32, marginBottom: 28 }}>
           <div style={{ fontSize: 64, fontWeight: 700, color: pct >= 70 ? COLORS.green : pct >= 40 ? COLORS.amber : COLORS.red, marginBottom: 4 }}>{pct}%</div>
           <div style={{ color: COLORS.textMuted, fontSize: 14, marginBottom: 24 }}>{score} / {questions.length} correct</div>
@@ -151,7 +203,7 @@ export default function TakeTest({ token, selectedTestId }) {
   return (
     <div className="fade-in" style={{ padding: "32px 36px", maxWidth: 720, margin: "0 auto" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
-        <div><h1 style={{ fontSize: 18, fontWeight: 600 }}>{attemptMeta.title}</h1><p style={{ color: COLORS.textMuted, fontSize: 13 }}>Question {safeCurrent + 1} of {questions.length}</p></div>
+        <div><h1 style={{ fontSize: 18, fontWeight: 600 }}>{attemptMeta.title}</h1><p style={{ color: COLORS.textMuted, fontSize: 13 }}>Plan {safeCurrent + 1} of {questions.length}</p></div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, color: timeLeft < 60 ? COLORS.red : COLORS.textSub, background: COLORS.card, border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 15, fontWeight: 600 }}><Icon name="clock" size={15} color={timeLeft < 60 ? COLORS.red : COLORS.textSub} />{fmt(timeLeft)}</div>
       </div>
 
@@ -175,7 +227,7 @@ export default function TakeTest({ token, selectedTestId }) {
 
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <button className="btn-ghost" onClick={() => setCurrent(p => Math.max(0, p - 1))} disabled={current === 0} style={{ opacity: current === 0 ? 0.4 : 1 }}>← Previous</button>
-        {safeCurrent < questions.length - 1 ? <button className="btn-primary" onClick={() => setCurrent(p => p + 1)}>Next →</button> : <button className="btn-primary" onClick={submitTest} style={{ background: COLORS.green }}>Submit Test</button>}
+        {safeCurrent < questions.length - 1 ? <button className="btn-primary" onClick={() => setCurrent(p => p + 1)}>Next →</button> : <button className="btn-primary" onClick={submitTest} style={{ background: COLORS.green }}>Submit Claim</button>}
       </div>
     </div>
   );

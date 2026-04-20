@@ -122,12 +122,12 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
     <div className="fade-in" style={{ padding: "32px 36px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
         <div>
-          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>{role === "Student" ? "Available Tests" : "Test Management"}</h1>
-          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>{role === "Student" ? "Choose a live/scheduled test and start" : "Create and manage timed assessments"}</p>
+          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>{role === "Student" ? "Available Policies" : "Policy Management"}</h1>
+          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>{role === "Student" ? "Choose an active policy and begin claim filing" : "Create and manage insurance policies"}</p>
         </div>
         {role === "Instructor" && (
           <button className="btn-primary" style={{ display: "flex", alignItems: "center", gap: 7 }} onClick={() => { resetForm(); setShowModal(true); }}>
-            <Icon name="plus" size={14} color="#fff" /> New Test
+            <Icon name="plus" size={14} color="#fff" /> New Policy
           </button>
         )}
       </div>
@@ -148,7 +148,7 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               {role === "Student" ? (
-                <button className="btn-primary" style={{ flex: 1, fontSize: 13, padding: "8px 0" }} onClick={() => { setSelectedTestId(t.id); setPage("take-test"); }}>Start Test</button>
+                <button className="btn-primary" style={{ flex: 1, fontSize: 13, padding: "8px 0" }} onClick={() => { setSelectedTestId(t.id); setPage("take-test"); }}>Start Claim</button>
               ) : (
                 <button className="btn-primary" style={{ flex: 1, fontSize: 13, padding: "8px 0" }} onClick={() => (t.status === "Completed" ? openResultsModal(t) : openEditModal(t))} disabled={loadingResults && t.status === "Completed"}>
                   {t.status === "Live" ? "Monitor" : t.status === "Scheduled" ? "Edit" : loadingResults ? "Loading..." : "Results"}
@@ -169,7 +169,7 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "grid", placeItems: "center", zIndex: 50 }}>
           <div className="card" style={{ width: 620, padding: 24 }}>
-            <h3 className="serif" style={{ fontSize: 24, marginBottom: 14 }}>{editingTestId ? "Edit Test" : "New Test"}</h3>
+            <h3 className="serif" style={{ fontSize: 24, marginBottom: 14 }}>{editingTestId ? "Edit Policy" : "New Policy"}</h3>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               <input className="input-field" placeholder="Title" value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} />
               <select className="input-field" value={form.topic} onChange={(e) => setForm((p) => ({ ...p, topic: e.target.value }))}>{["Data Structures", "Algorithms", "Databases", "Networking", "OS"].map((t) => <option key={t}>{t}</option>)}</select>
@@ -181,7 +181,7 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
               )}
             </div>
             <p style={{ color: COLORS.textMuted, fontSize: 12, marginTop: 12 }}>
-              Question count is auto-calculated from selected subject questions.
+              Plan count is auto-calculated from selected policy type plans.
             </p>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 18 }}>
               <button className="btn-ghost" onClick={() => { setShowModal(false); resetForm(); }}>Cancel</button>
@@ -194,7 +194,7 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
       {showQuestionsModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "grid", placeItems: "center", zIndex: 55 }}>
           <div className="card" style={{ width: 760, maxHeight: "84vh", padding: 24, display: "flex", flexDirection: "column" }}>
-            <h3 className="serif" style={{ fontSize: 24, marginBottom: 6 }}>Manage Test Questions</h3>
+            <h3 className="serif" style={{ fontSize: 24, marginBottom: 6 }}>Manage Policy Plan Items</h3>
             <p style={{ color: COLORS.textMuted, fontSize: 13, marginBottom: 14 }}>
               {questionModalTest?.title} · Subject: {questionModalTest?.topic || "-"} · Selected: {selectedQuestionIds.length}
             </p>
@@ -218,10 +218,10 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-              <span style={{ color: COLORS.textMuted, fontSize: 12 }}>Only subject-matched approved questions are shown. Count is automatic.</span>
+              <span style={{ color: COLORS.textMuted, fontSize: 12 }}>Only policy-type matched approved plans are shown. Count is automatic.</span>
               <div style={{ display: "flex", gap: 10 }}>
                 <button className="btn-ghost" onClick={() => { setShowQuestionsModal(false); setQuestionModalTest(null); setQuestionPool([]); setSelectedQuestionIds([]); }}>Cancel</button>
-                <button className="btn-primary" onClick={saveManagedQuestions} disabled={selectedQuestionIds.length === 0} style={{ opacity: selectedQuestionIds.length === 0 ? 0.5 : 1 }}>Save Questions</button>
+                <button className="btn-primary" onClick={saveManagedQuestions} disabled={selectedQuestionIds.length === 0} style={{ opacity: selectedQuestionIds.length === 0 ? 0.5 : 1 }}>Save Plan Items</button>
               </div>
             </div>
           </div>
@@ -231,7 +231,7 @@ export default function Tests({ token, role, setPage, setSelectedTestId }) {
       {showResultsModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "grid", placeItems: "center", zIndex: 60 }}>
           <div className="card" style={{ width: 760, maxHeight: "84vh", overflowY: "auto", padding: 24 }}>
-            <h3 className="serif" style={{ fontSize: 24, marginBottom: 6 }}>Completed Exam Analytics</h3>
+            <h3 className="serif" style={{ fontSize: 24, marginBottom: 6 }}>Closed Policy Analytics</h3>
             <p style={{ color: COLORS.textMuted, fontSize: 13, marginBottom: 14 }}>
               {resultsAnalytics?.summary?.title} · {resultsAnalytics?.summary?.topic}
             </p>

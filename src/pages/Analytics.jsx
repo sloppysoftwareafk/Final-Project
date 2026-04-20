@@ -15,12 +15,12 @@ export default function Analytics({ token }) {
     <div className="fade-in" style={{ padding: "32px 36px" }}>
       <div style={{ marginBottom: 28 }}>
         <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>Analytics</h1>
-        <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>Performance insights across all tests</p>
+        <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>Operational insights across policies and claims</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Topic-wise Average Score</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Policy Type Approval Rate</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {topicData.map(d => (
               <div key={d.topic}>
@@ -35,7 +35,7 @@ export default function Analytics({ token }) {
         </div>
 
         <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Attempt Volume by Topic</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Claim Volume by Policy Type</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {[...topicData].sort((a, b) => b.attempts - a.attempts).map(d => (
               <div key={d.topic} style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -49,7 +49,7 @@ export default function Analytics({ token }) {
         </div>
 
         <div className="card" style={{ padding: 24 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Score Distribution</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20 }}>Approval Distribution</h2>
           <div style={{ display: "flex", gap: 8, alignItems: "flex-end", height: 120 }}>
             {distribution.map((b) => (
               <div key={b.range} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
@@ -63,10 +63,10 @@ export default function Analytics({ token }) {
 
         <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16, justifyContent: "center" }}>
           {[
-            { label: "Total Questions", value: analytics.summary.total_questions || 0, color: COLORS.accentSoft },
-            { label: "Active Tests", value: analytics.summary.active_tests || 0, color: COLORS.green },
-            { label: "Students", value: analytics.summary.students_enrolled || 0, color: COLORS.amber },
-            { label: "Average Score", value: `${analytics.summary.avg_score || 0}%`, color: COLORS.textSub },
+            { label: "Total Plans", value: analytics.summary.total_questions || 0, color: COLORS.accentSoft },
+            { label: "Active Policies", value: analytics.summary.active_tests || 0, color: COLORS.green },
+            { label: "Customers", value: analytics.summary.students_enrolled || 0, color: COLORS.amber },
+            { label: "Average Approval", value: `${analytics.summary.avg_score || 0}%`, color: COLORS.textSub },
           ].map(k => (
             <div key={k.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${COLORS.border}` }}>
               <span style={{ fontSize: 13, color: COLORS.textMuted }}>{k.label}</span>
@@ -77,7 +77,7 @@ export default function Analytics({ token }) {
       </div>
 
       <div className="card" style={{ padding: 24, marginTop: 20 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Per Exam Analytics (Completed Tests)</h2>
+        <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Per Policy Analytics (Closed Policies)</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {examData.map((exam) => (
             <div key={exam.id} style={{ border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: 14, background: COLORS.surface }}>
@@ -94,13 +94,13 @@ export default function Analytics({ token }) {
             </div>
           ))}
           {examData.length === 0 && (
-            <div style={{ color: COLORS.textMuted, fontSize: 13 }}>No completed tests found yet.</div>
+            <div style={{ color: COLORS.textMuted, fontSize: 13 }}>No closed policies found yet.</div>
           )}
         </div>
       </div>
 
       <div className="card" style={{ padding: 24, marginTop: 20 }}>
-        <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Student Leaderboard by Subject</h2>
+        <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>Top Customers by Policy Type</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {subjectLeaderboards.map((subject) => (
             <div key={subject.topic} className="card" style={{ padding: 14, background: COLORS.surface }}>

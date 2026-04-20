@@ -4,7 +4,7 @@ import { auth, allowRoles } from "../../middleware/auth.js";
 
 const router = express.Router();
 
-router.get("/tests/:id/question-pool", auth, allowRoles("Instructor"), async (req, res) => {
+router.get("/tests/:id/question-pool", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   try {
     const testCheck = await pool.query("SELECT id, topic FROM tests WHERE id = $1", [id]);
@@ -42,7 +42,7 @@ router.get("/tests/:id/question-pool", auth, allowRoles("Instructor"), async (re
   }
 });
 
-router.put("/tests/:id/questions", auth, allowRoles("Instructor"), async (req, res) => {
+router.put("/tests/:id/questions", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   const { questionIds } = req.body;
 
@@ -104,7 +104,7 @@ router.put("/tests/:id/questions", auth, allowRoles("Instructor"), async (req, r
   }
 });
 
-router.post("/tests/:id/generate", auth, allowRoles("Instructor"), async (req, res) => {
+router.post("/tests/:id/generate", auth, allowRoles("Admin"), async (req, res) => {
   const { id } = req.params;
   const { numQuestions, difficultyDistribution } = req.body;
 
