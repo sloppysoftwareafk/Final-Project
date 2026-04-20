@@ -101,7 +101,7 @@ export default function App() {
     if (page === "dashboard") return <Dashboard setPage={setPage} setSelectedTestId={setSelectedTestId} summary={summary} leaderboard={leaderboard} tests={dashboardTests} role={user.role} user={user} />;
     if (page === "questions") return <QuestionBank token={token} role={user.role} />;
     if (page === "tests") return <Tests token={token} role={user.role} setPage={setPage} setSelectedTestId={setSelectedTestId} />;
-    if (page === "take-test") return <TakeTest token={token} selectedTestId={selectedTestId} />;
+    if (page === "take-test") return <TakeTest token={token} selectedTestId={selectedTestId} onSelectTest={setSelectedTestId} />;
     if (page === "analytics" && user.role === "Admin") return <Analytics token={token} />;
     if (page === "results" && user.role === "Customer") return <StudentResults token={token} />;
     return null;

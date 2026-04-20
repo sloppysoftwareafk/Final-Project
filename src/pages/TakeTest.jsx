@@ -4,9 +4,11 @@ import { COLORS } from "../lib/theme";
 import Icon from "../components/Icon";
 import { DifficultyPill, Pill } from "../components/Pills";
 
-export default function TakeTest({ token, selectedTestId }) {
+export default function TakeTest({ token, selectedTestId, onSelectTest }) {
   const [attemptMeta, setAttemptMeta] = useState(null);
   const [questions, setQuestions] = useState([]);
+  const [availablePolicies, setAvailablePolicies] = useState([]);
+  const [loadingPolicies, setLoadingPolicies] = useState(false);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -15,6 +17,22 @@ export default function TakeTest({ token, selectedTestId }) {
   const [error, setError] = useState("");
 
   const storageKey = selectedTestId ? `take-test:${selectedTestId}` : null;
+
+  useEffect(() => {
+    if (selectedTestId) return;
+    (async () => {
+      try {
+        setLoadingPolicies(true);
+        setError("");
+        const list = await api("/tests", { token });
+        setAvailablePolicies(Array.isArray(list) ? list : []);
+      } catch (err) {
+        setError(err.message || "Unable to load policies");
+      } finally {
+        setLoadingPolicies(false);
+      }
+    })();
+  }, [selectedTestId, token]);
 
   useEffect(() => {
     if (!selectedTestId) return;
@@ -109,7 +127,41 @@ export default function TakeTest({ token, selectedTestId }) {
     autoSubmit();
   }, [timeLeft, attemptMeta, submitted, questions.length, answers, selectedTestId, token, storageKey]);
 
-  if (!selectedTestId) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24 }}>Select a policy from Policies page.</div></div>;
+  if (!selectedTestId) {
+    return (
+      <div className="fade-in" style={{ padding: "32px 36px" }}>
+        <div style={{ marginBottom: 18 }}>
+          <h1 className="serif" style={{ fontSize: 28, fontWeight: 400, letterSpacing: "-0.02em" }}>File Claim</h1>
+          <p style={{ color: COLORS.textMuted, fontSize: 13, marginTop: 4 }}>Choose a policy to start your claim flow.</p>
+        </div>
+        <div className="card" style={{ padding: 20 }}>
+          {loadingPolicies ? (
+            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>Loading available policies...</p>
+          ) : availablePolicies.length === 0 ? (
+            <p style={{ color: COLORS.textMuted, fontSize: 13 }}>No active policies are available right now.</p>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 12 }}>
+              {availablePolicies.map((policy) => (
+                <div key={policy.id} style={{ border: `1px solid ${COLORS.border}`, borderRadius: 10, padding: 14, background: COLORS.surface }}>
+                  <div style={{ fontSize: 14, fontWeight: 600 }}>{policy.title}</div>
+                  <div style={{ fontSize: 12, color: COLORS.textMuted, marginTop: 4 }}>
+                    {policy.topic} · {policy.questions} plans · {policy.duration}m
+                  </div>
+                  <button
+                    className="btn-primary"
+                    style={{ marginTop: 10, width: "100%", fontSize: 12, padding: "7px 0" }}
+                    onClick={() => onSelectTest?.(policy.id)}
+                  >
+                    Start Claim
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
   if (error) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24, color: COLORS.red }}>{error}</div></div>;
   if (!attemptMeta || questions.length === 0) return <div className="fade-in" style={{ padding: "32px 36px" }}><div className="card" style={{ padding: 24 }}>Loading policy details...</div></div>;
 
